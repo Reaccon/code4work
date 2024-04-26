@@ -1,0 +1,1205 @@
+// ********************************************************************************************
+// Aktivieren des Onlinezugriffs auf SPS-Daten:
+// 1. TagItemList aktivieren
+//    ActivateTagItemList({Name einer beliebigen TagItemList}, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+// ********************************************************************************************
+//                                                         
+//-----------------------------------------------
+// AB HIER NEUES PROGRAMM FÜR FAHRWAGENLISTE
+//-----------------------------------------------                    
+// ********************************************************************************************
+// Fahrwagenliste
+// ********************************************************************************************
+
+
+
+// ********************************************************************************************
+// To-Do liste
+//
+// Auflistung funktioniert nicht
+//
+// ********************************************************************************************
+
+
+
+
+
+// Anlagenspezifische Konstanten 
+const
+//-------- FW1
+FW1_XTV001         =   410;    // DB-Nr FW1 DB_000XTV001@DATA (ERLEDIGT)
+FW1_LJU_DATA       =    329;     // DB_LJU_CENTRAL_DATA
+//EHB_USER_REP        =  1071;    // DB-Reperaturgrund   (DB1071)
+
+//-------- FW2
+FW2_XTV001         =   410;    // DB-Nr FW2 DB_000XTV001@DATA (ERLEDIGT)
+FW2_LJU_DATA       =    329;     // DB_LJU_CENTRAL_DATA
+            
+//-------- FW3
+FW3_XTV001         =    410;    // DB-Nr FW3 DB_000XTV001@DATA  (ERLEDIGT)
+FW3_LJU_DATA       =    329;     // DB_LJU_CENTRAL_DATA
+          
+//-------- FW4
+FW4_XTV001         =    681;    // DB-Nr FW4 DB_000XTV001@DATA (ERLEDIGT)
+FW4_LJU_DATA       =    679;     // DB_LJU_CENTRAL_DATA
+
+     
+
+// Start userStatic/Dynamik bereiche im DB_000XTV001@DATA
+//FW1
+beginXTV_Head1 =    0;         
+beginXTV_Stat1 =    1488;                    
+beginXTV_Dyn1  =    4216;
+//Structs
+beginST1            =    1488;      //Start userStructStatic Stationsnummer
+beginPN1            =    1506;      //Start userStructStatic Produktionsnummer XTV DATA
+beginFB1            =    1514;      //Start userStructStatic Fahrzeug-Typ       
+beginBM1            =    1518;      //Start userStructStatic Baumuster     
+beginTK1            =    1530;      //Start userStructStatic Tätigkeitsmuster    
+beginFN1            =    1550;      //Start userStructStatic SPF Nummer
+beginSN1            =    1552;      //Start userStructStatic Schichtnummer
+
+//FW2
+beginXTV_Head2 =    0;         
+beginXTV_Stat2 =    1584;                    
+beginXTV_Dyn2  =    4488;   
+//Structs
+beginST2            =    1584;      //Start userStructStatic Stationsnummer
+beginPN2            =    1602;      //Start userStructStatic Produktionsnummer XTV DATA
+beginFB2            =    1610;      //Start userStructStatic Fahrzeug-Typ       
+beginBM2            =    1614;      //Start userStructStatic Baumuster     
+beginTK2            =    1626;      //Start userStructStatic Tätigkeitsmuster    
+beginFN2            =    1646;      //Start userStructStatic SPF Nummer
+beginSN2            =    1648;      //Start userStructStatic Schichtnummer
+
+//FW3
+beginXTV_Head3 =    0;         
+beginXTV_Stat3 =    1632;                    
+beginXTV_Dyn3  =    4624;    
+//Structs
+beginST3            =    1632;      //Start userStructStatic Stationsnummer
+beginPN3            =    1650;      //Start userStructStatic Produktionsnummer XTV DATA
+beginFB3            =    1658;      //Start userStructStatic Fahrzeug-Typ       
+beginBM3            =    1662;      //Start userStructStatic Baumuster     
+beginTK3            =    1674;      //Start userStructStatic Tätigkeitsmuster    
+beginFN3            =    1694;      //Start userStructStatic SPF Nummer
+beginSN3            =    1696;      //Start userStructStatic Schichtnummer
+
+//FW4
+beginXTV_Head4 =    0;         
+beginXTV_Stat4 =    2112;                    
+beginXTV_Dyn4  =    5984;    
+//Structs
+beginST4            =    2112;      //Start userStructStatic Stationsnummer
+beginPN4            =    2130;      //Start userStructStatic Produktionsnummer XTV DATA
+beginFB4            =    2138;      //Start userStructStatic Fahrzeug-Typ
+beginBM4            =    2142;      //Start userStructStatic Baumuster 
+beginTK4            =    2154;      //Start userStructStatic Tätigkeitsmuster
+beginFN4            =    2174;      //Start userStructStatic SPF Nummer
+beginSN4            =    2176;      //Start userStructStatic Schichtnummer
+
+
+beginHeaderXTV     =    0;        //Start Bereich UserXTV headerStruct
+lenHeaderXTV       =    48;        //Länge Bereich UserXTV headerStruct
+beginUserXTV       =    0;        //Start Bereich XTV UserStructStatic   
+lenUserXTV         =    88;        //Länge Bereich XTV UserStructStatic          
+
+            
+//AbsolutPosition 1 Fahrwagen                                                 
+beginAbsPos1       =    812;       // start DB-Bereich für AbsPos1
+lenAbsPos1           =    18;        // länge bis nächste Pos
+
+//Reparaturgrund wird später hinzugefügt
+//beginRep            =    0;      //Struct  Beginn Reparatur1
+//lenUserRep          =  100;      //Struct  Beginn Rep 2
+
+
+
+//Variablen            // festlegen Variablen zur Befüllung der Daten im grid
+objectvar
+i           :   integer;                      
+                                       
+//Grid1.Cells[3,0] := 'Position';
+FwPos1      :   array[0..200] of Tisi_TagItem;
+FwPos2      :   array[0..200] of Tisi_TagItem;
+FwPos3      :   array[0..200] of Tisi_TagItem;
+FwPos4      :   array[0..200] of Tisi_TagItem;
+
+//Grid1.Cells[2,0] := 'Station';                                                                                                                                      
+FwSt1       :   array[0..200] of Tisi_TagItem;
+FwSt2       :   array[0..200] of Tisi_TagItem;
+FwSt3       :   array[0..200] of Tisi_TagItem;
+FwSt4       :   array[0..200] of Tisi_TagItem;                              
+                    
+//Grid1.Cells[4,0] := 'Produktions-Nr.';
+PN1         :   array[0..200] of Tisi_TagItem;
+PN2         :   array[0..200] of Tisi_TagItem;
+PN3         :   array[0..200] of Tisi_TagItem;
+PN4         :   array[0..200] of Tisi_TagItem;
+
+//Grid1.Cells[5,0] := 'Fahrzeugtyp';
+FB1         :   array[0..200] of Tisi_TagItem;
+FB2         :   array[0..200] of Tisi_TagItem;
+FB3         :   array[0..200] of Tisi_TagItem;
+FB4         :   array[0..200] of Tisi_TagItem;
+//Grid1.Cells[6,0] := 'Schichtnummer';
+SN1         :   array[0..200] of Tisi_TagItem;
+SN2         :   array[0..200] of Tisi_TagItem;
+SN3         :   array[0..200] of Tisi_TagItem;
+SN4         :   array[0..200] of Tisi_TagItem;
+//Grid1.Cells[7,0] := 'Baumuster';
+BM1         :   array[0..200] of Tisi_TagItem;
+BM2         :   array[0..200] of Tisi_TagItem;
+BM3         :   array[0..200] of Tisi_TagItem;
+BM4         :   array[0..200] of Tisi_TagItem; 
+//Grid1.Cells[8,0] := 'Tagesnummer';
+TK1         :   array[0..200] of Tisi_TagItem;
+TK2         :   array[0..200] of Tisi_TagItem;
+TK3         :   array[0..200] of Tisi_TagItem;
+TK4         :   array[0..200] of Tisi_TagItem;
+//Grid1.Cells[9,0] := 'Reparatur';  
+RP1         :   array[0..200] of Tisi_TagItem;
+RP2         :   array[0..200] of Tisi_TagItem;
+RP3         :   array[0..200] of Tisi_TagItem;
+RP4         :   array[0..200] of Tisi_TagItem;
+
+end;
+
+// Form1.OnCreate
+// Einfügen der Überschriften im Grid
+procedure isi_FormCreate(Sender: TObject);
+begin
+i:= 0;   
+        
+
+        Grid1.Cells[0,0] := 'FW';
+        Grid1.Cells[1,0] := 'Anlage';
+        Grid1.Cells[2,0] := 'Position';
+        Grid1.Cells[3,0] := 'Station';
+        Grid1.Cells[4,0] := 'Produktions-Nr.';
+        Grid1.Cells[5,0] := 'Fahrzeugtyp';
+        Grid1.Cells[6,0] := 'Schichtnummer';
+        Grid1.Cells[7,0] := 'Baumuster';
+        Grid1.Cells[8,0] := 'Tagesnummer';
+        Grid1.Cells[9,0] := 'Reparatur'; 
+        Grid1.Cells[10,0] := 'Test';     
+                       
+   
+
+for i:= 1 To 200 do
+begin
+//Grid befüllen mit Daten 
+    Grid1.Cells[0,i] := IntToStr(i);            
+//FW1-----------------------------------------------------------------------------------------------------------
+ 
+//Grid1.Cells[2,0] := 'Position';         
+//POS
+    FwPos1[i]                := Tisi_TagItem.Create(FW1);
+    FwPos1[i].TagItemList    := FW1;
+    FwPos1[i].Name           := 'FwPos1' + IntToStr(i);
+    FwPos1[i].Tag            := i;
+    FwPos1[i].TagName        := 'DB'+ IntToStr(FW1_LJU_DATA) + ',DINT' + IntToStr(beginAbsPos1 + ((i-1) * lenAbsPos1)); 
+    FwPos1[i].OnValueChange  := UpdateFwPos1; 
+    FwPos1[i].TagNameType    := ttAbsolute; 
+       
+//Grid1.Cells[3,0] := 'Station';                     
+//ST                 
+    FwSt1[i]                  := Tisi_TagItem.Create(FW1PN);
+    FwSt1[i].TagItemList      := FW1;
+    FwSt1[i].Name             := 'FwSt1' + IntToStr(i);
+    FwSt1[i].Tag              := i;                                                                                              
+//    FwSt1[i].TagName          := 'DB'+ IntToStr(FW1_XTV001) + ',DINT' + IntToStr(beginST1 + ((i-1) * lenUserXTV)) + ',8';     //NEU
+    FwSt1[i].TagName          := 'DB'+ IntToStr(FW1_XTV001) + ',S' + IntToStr(beginHeaderXTV + ((i-1) * lenHeaderXTV)) + ',16';     //NEU
+    FwSt1[i].OnValueChange    := UpdateFwSt1; 
+    FwSt1[i].TagNameType      := ttAbsolute;    
+
+//Grid1.Cells[4,0] := 'Produktions-Nr.'; 
+//PN    
+    PN1[i]                := Tisi_TagItem.Create(FW1PN);
+    PN1[i].TagItemList    := FW1PN;
+    PN1[i].Name           := 'PN1' + IntToStr(i);
+    PN1[i].Tag            := i;
+    PN1[i].TagName        := 'DB'+ IntToStr(FW1_XTV001) + ',S' + IntToStr(beginPN1 + ((i-1) * lenUserXTV)) + ',8';              
+    PN1[i].OnValueChange  := UpdatePN1; 
+    PN1[i].TagNameType    := ttAbsolute;
+
+
+//Grid1.Cells[5,0] := 'Fahrzeugtyp';     
+//FB    
+    FB1[i]                := Tisi_TagItem.Create(FW1PN);
+    FB1[i].TagItemList    := FW1PN;
+    FB1[i].Name           := 'FB1' + IntToStr(i);
+    FB1[i].Tag            := i;
+    FB1[i].TagName        := 'DB'+ IntToStr(FW1_XTV001) + ',S' + IntToStr(beginFB1+ ((i-1) * lenUserXTV)) + ',4'; 
+    FB1[i].OnValueChange  := UpdateFB1; 
+    FB1[i].TagNameType    := ttAbsolute;   
+
+
+//Grid1.Cells[6,0] := 'Schichtnummer';    
+//SN    
+    SN1[i]                := Tisi_TagItem.Create(FW1PN);
+    SN1[i].TagItemList    := FW1PN;
+    SN1[i].Name           := 'SN1' + IntToStr(i);
+    SN1[i].Tag            := i;
+    SN1[i].TagName        := 'DB'+ IntToStr(FW1_XTV001) + ',S' + IntToStr(beginSN1 + ((i-1) * lenUserXTV)) + ',4';
+    SN1[i].OnValueChange  := UpdateSN1;
+    SN1[i].TagNameType    := ttAbsolute;
+
+
+//Grid1.Cells[7,0] := 'Baumuster';      
+//BM    
+    BM1[i]                := Tisi_TagItem.Create(FW1PN);
+    BM1[i].TagItemList    := FW1PN;
+    BM1[i].Name           := 'BM1' + IntToStr(i);
+    BM1[i].Tag            := i;
+    BM1[i].TagName        := 'DB'+ IntToStr(FW1_XTV001) + ',S' + IntToStr(beginBM1 + ((i-1) * lenUserXTV)) + ',8';
+    BM1[i].OnValueChange  := UpdateBM1;
+    BM1[i].TagNameType    := ttAbsolute;
+
+
+//Grid1.Cells[8,0] := 'Tagesnummer';     
+//TK    
+    TK1[i]                := Tisi_TagItem.Create(FW1PN);
+    TK1[i].TagItemList    := FW1PN;
+    TK1[i].Name           := 'TK1' + IntToStr(i);
+    TK1[i].Tag            := i;
+    TK1[i].TagName        := 'DB'+ IntToStr(FW1_XTV001) + ',S' + IntToStr(beginTK1+ ((i-1) * lenUserXTV)) + ',8';
+    TK1[i].OnValueChange  := UpdateTK1;
+    TK1[i].TagNameType    := ttAbsolute;
+
+//
+//Grid1.Cells[9,0] := 'Reparatur';         
+////RP    
+//    RP1[i]                := Tisi_TagItem.Create(FW1PN);
+//    RP1[i].TagItemList    := FW1PN;
+//    RP1[i].Name           := 'RP1' + IntToStr(i);
+//    RP1[i].Tag            := i;
+//    RP1[i].TagName        := 'DB'+ IntToStr(FW_USER_REP) + ',S' + IntToStr(beginFW1_Rep + ((i-1) * lenUserRep)) + ',100';
+//    RP1[i].OnValueChange  := UpdateRP1;
+//    RP1[i].TagNameType    := ttAbsolute;                 
+
+
+//FW2-----------------------------------------------------------------------------------------------------------
+ 
+//Grid1.Cells[3,0] := 'Position'; 
+//POS       
+    FWPos2[i]                := Tisi_TagItem.Create(FW2);
+    FWPos2[i].TagItemList    := FW2;
+    FWPos2[i].Name           := 'FWPos2' + IntToStr(i);
+    FWPos2[i].Tag            := i;
+    FWPos2[i].TagName        := 'DB'+ IntToStr(FW2_LJU_DATA) + ',DINT' + IntToStr(beginAbsPos1 + ((i-1) * lenAbsPos1)); 
+    FWPos2[i].OnValueChange  := UpdateFwPos2; 
+    FWPos2[i].TagNameType    := ttAbsolute; 
+    
+//Grid1.Cells[2,0] := 'Station';    
+//ST                    
+    FwSt2[i]                  := Tisi_TagItem.Create(FW2PN);
+    FwSt2[i].TagItemList      := FW2;
+    FwSt2[i].Name             := 'FwSt2' + IntToStr(i);
+    FwSt2[i].Tag              := i;                                                                                         
+//    FwSt2[i].TagName          := 'DB'+ IntToStr(FW2_XTV001) + ',DINT' + IntToStr(beginST2 + ((i-1) * lenUserXTV)) + ',8';     //NEU
+    FwSt2[i].TagName          := 'DB'+ IntToStr(FW2_XTV001) + ',S' + IntToStr(beginHeaderXTV + ((i-1) * lenHeaderXTV)) + ',16';     //NEU   
+    FwSt2[i].OnValueChange    := UpdateFwSt2; 
+    FwSt2[i].TagNameType      := ttAbsolute;   
+   
+//Grid1.Cells[4,0] := 'Produktions-Nr.';  
+//PN    
+    PN2[i]                := Tisi_TagItem.Create(FW2PN);
+    PN2[i].TagItemList    := FW2PN;
+    PN2[i].Name           := 'PN2' + IntToStr(i);
+    PN2[i].Tag            := i;
+    PN2[i].TagName        := 'DB'+ IntToStr(FW2_XTV001) + ',S' + IntToStr(beginPN2 + ((i-1) * lenUserXTV)) + ',8';              
+    PN2[i].OnValueChange  := UpdatePN2; 
+    PN2[i].TagNameType    := ttAbsolute;
+
+
+//Grid1.Cells[5,0] := 'Fahrzeugtyp';   
+//FB    
+    FB2[i]                := Tisi_TagItem.Create(FW2PN);
+    FB2[i].TagItemList    := FW2PN;
+    FB2[i].Name           := 'FB2' + IntToStr(i);
+    FB2[i].Tag            := i;
+    FB2[i].TagName        := 'DB'+ IntToStr(FW2_XTV001) + ',S' + IntToStr(beginFB2 + ((i-1) * lenUserXTV)) + ',4'; 
+    FB2[i].OnValueChange  := UpdateFB2; 
+    FB2[i].TagNameType    := ttAbsolute;
+
+
+//Grid1.Cells[6,0] := 'Schichtnummer';               
+//SN    
+    SN2[i]                := Tisi_TagItem.Create(FW2PN);
+    SN2[i].TagItemList    := FW2PN;
+    SN2[i].Name           := 'SN2' + IntToStr(i);
+    SN2[i].Tag            := i;
+    SN2[i].TagName        := 'DB'+ IntToStr(FW2_XTV001) + ',S' + IntToStr(beginSN2 + ((i-1) * lenUserXTV)) + ',4';
+    SN2[i].OnValueChange  := UpdateSN2;
+    SN2[i].TagNameType    := ttAbsolute;
+
+
+//Grid1.Cells[7,0] := 'Baumuster';   
+//BM    
+    BM2[i]                := Tisi_TagItem.Create(FW2PN);
+    BM2[i].TagItemList    := FW2PN;
+    BM2[i].Name           := 'BM2' + IntToStr(i);
+    BM2[i].Tag            := i;
+    BM2[i].TagName        := 'DB'+ IntToStr(FW2_XTV001) + ',S' + IntToStr(beginBM2 + ((i-1) * lenUserXTV)) + ',12';
+    BM2[i].OnValueChange  := UpdateBM2;
+    BM2[i].TagNameType    := ttAbsolute;
+
+
+//Grid1.Cells[8,0] := 'Tagesnummer';     
+//TK    
+    TK2[i]                := Tisi_TagItem.Create(FW2PN);
+    TK2[i].TagItemList    := FW2PN;
+    TK2[i].Name           := 'TK2' + IntToStr(i);
+    TK2[i].Tag            := i;
+    TK2[i].TagName        := 'DB'+ IntToStr(FW2_XTV001) + ',S' + IntToStr(beginTK2 + ((i-1) * lenUserXTV)) + ',8';
+    TK2[i].OnValueChange  := UpdateTK2;
+    TK2[i].TagNameType    := ttAbsolute;
+
+
+//Grid1.Cells[9,0] := 'Reparatur';         
+////RP    
+//    RP2[i]                := Tisi_TagItem.Create(FW2PN);
+//    RP2[i].TagItemList    := FW2PN;
+//    RP2[i].Name           := 'RP2' + IntToStr(i);
+//    RP2[i].Tag            := i;
+//    RP2[i].TagName        := 'DB'+ IntToStr(FW2_USER_REP) + ',S' + IntToStr(beginFW2_Rep + ((i-1) * lenUserRep)) + ',100';
+//    RP2[i].OnValueChange  := UpdateRP2;
+//    RP2[i].TagNameType    := ttAbsolute;    
+ 
+
+//FW3-----------------------------------------------------------------------------------------------------------
+  
+//Grid1.Cells[3,0] := 'Position';         
+//POS
+    FWPos3[i]                := Tisi_TagItem.Create(FW3);
+    FWPos3[i].TagItemList    := FW3;
+    FWPos3[i].Name           := 'FWPos3' + IntToStr(i);
+    FWPos3[i].Tag            := i;
+    FWPos3[i].TagName        := 'DB'+ IntToStr(FW3_LJU_DATA) + ',DINT' + IntToStr(beginAbsPos1 + ((i-1) * lenAbsPos1)); 
+    FWPos3[i].OnValueChange  := UpdateFwPos3; 
+    FWPos3[i].TagNameType    := ttAbsolute;     
+    
+//Grid1.Cells[2,0] := 'Station';        
+//ST                                     
+    FwSt3[i]                  := Tisi_TagItem.Create(FW3);
+    FwSt3[i].TagItemList      := FW3;
+    FwSt3[i].Name             := 'FwSt3' + IntToStr(i);
+    FwSt3[i].Tag              := i;     
+//    FwSt3[i].TagName          := 'DB'+ IntToStr(FW3_XTV001) + ',DINT' + IntToStr(beginST3 + ((i-1) * lenUserXTV)) + ',8';     //NEU
+    FwSt3[i].TagName          := 'DB'+ IntToStr(FW3_XTV001) + ',S' + IntToStr(beginHeaderXTV + ((i-1) * lenHeaderXTV)) + ',16';     //NEU   
+    FwSt3[i].OnValueChange    := UpdateFwSt3; 
+    FwSt3[i].TagNameType      := ttAbsolute; 
+      
+//Grid1.Cells[4,0] := 'Produktions-Nr.'; 
+//PN    
+    PN3[i]                := Tisi_TagItem.Create(FW3PN);
+    PN3[i].TagItemList    := FW3PN;
+    PN3[i].Name           := 'PN3' + IntToStr(i);
+    PN3[i].Tag            := i;
+    PN3[i].TagName        := 'DB'+ IntToStr(FW3_XTV001) + ',S' + IntToStr(beginPN3 + ((i-1) * lenUserXTV)) + ',8';              
+    PN3[i].OnValueChange  := UpdatePN3; 
+    PN3[i].TagNameType    := ttAbsolute;    
+    
+//Grid1.Cells[5,0] := 'Fahrzeugtyp';   
+//FB    
+    FB3[i]                := Tisi_TagItem.Create(FW3PN);
+    FB3[i].TagItemList    := FW3PN;
+    FB3[i].Name           := 'FB3' + IntToStr(i);
+    FB3[i].Tag            := i;
+    FB3[i].TagName        := 'DB'+ IntToStr(FW3_XTV001) + ',S' + IntToStr(beginFB3 + ((i-1) * lenUserXTV)) + ',4'; 
+    FB3[i].OnValueChange  := UpdateFB3; 
+    FB3[i].TagNameType    := ttAbsolute;  
+    
+//Grid1.Cells[6,0] := 'Schichtnummer';      
+//SN    
+    SN3[i]                := Tisi_TagItem.Create(FW3PN);
+    SN3[i].TagItemList    := FW3PN;
+    SN3[i].Name           := 'SN3' + IntToStr(i);
+    SN3[i].Tag            := i;
+    SN3[i].TagName        := 'DB'+ IntToStr(FW3_XTV001) + ',S' + IntToStr(beginSN3 + ((i-1) * lenUserXTV)) + ',4';
+    SN3[i].OnValueChange  := UpdateSN3;
+    SN3[i].TagNameType    := ttAbsolute;
+    
+//Grid1.Cells[7,0] := 'Baumuster';        
+//BM    
+    BM3[i]                := Tisi_TagItem.Create(FW3PN);
+    BM3[i].TagItemList    := FW3PN;
+    BM3[i].Name           := 'BM3' + IntToStr(i);
+    BM3[i].Tag            := i;
+    BM3[i].TagName        := 'DB'+ IntToStr(FW3_XTV001) + ',S' + IntToStr(beginBM3 + ((i-1) * lenUserXTV)) + ',12';
+    BM3[i].OnValueChange  := UpdateBM3;
+    BM3[i].TagNameType    := ttAbsolute;
+    
+//Grid1.Cells[8,0] := 'Tagesnummer';  
+//TK    
+    TK3[i]                := Tisi_TagItem.Create(FW3PN);
+    TK3[i].TagItemList    := FW3PN;
+    TK3[i].Name           := 'TK3' + IntToStr(i);
+    TK3[i].Tag            := i;
+    TK3[i].TagName        := 'DB'+ IntToStr(FW3_XTV001) + ',S' + IntToStr(beginTK3 + ((i-1) * lenUserXTV)) + ',8';
+    TK3[i].OnValueChange  := UpdateTK3;
+    TK3[i].TagNameType    := ttAbsolute;
+    
+//Grid1.Cells[9,0] := 'Reparatur';  
+////RP    
+//    RP3[i]                := Tisi_TagItem.Create(FW3PN);
+//    RP3[i].TagItemList    := FW3PN;
+//    RP3[i].Name           := 'RP3' + IntToStr(i);
+//    RP3[i].Tag            := i;
+//    RP3[i].TagName        := 'DB'+ IntToStr(FW3_USER_REP) + ',S' + IntToStr(beginFW3_Rep + ((i-1) * lenUserRep)) + ',100';
+//    RP3[i].OnValueChange  := UpdateRP3;
+//    RP3[i].TagNameType    := ttAbsolute; 
+    
+
+//FW4-----------------------------------------------------------------------------------------------------------
+     
+//Grid1.Cells[3,0] := 'Position';        
+//POS
+    FWPos4[i]                := Tisi_TagItem.Create(FW4);
+    FWPos4[i].TagItemList    := FW4;
+    FWPos4[i].Name           := 'FWPos4' + IntToStr(i);
+    FWPos4[i].Tag            := i;
+    FWPos4[i].TagName        := 'DB'+ IntToStr(FW4_LJU_DATA) + ',DINT' + IntToStr(beginAbsPos1 + ((i-1) * lenAbsPos1)); 
+    FWPos4[i].OnValueChange  := UpdateFwPos4; 
+    FWPos4[i].TagNameType    := ttAbsolute; 
+    
+//Grid1.Cells[2,0] := 'Station';       
+//ST           
+    FwSt4[i]                  := Tisi_TagItem.Create(FW4);
+    FwSt4[i].TagItemList      := FW4;
+    FwSt4[i].Name             := 'FwSt4' + IntToStr(i);
+    FwSt4[i].Tag              := i;     
+//    FwSt4[i].TagName          := 'DB'+ IntToStr(FW4_XTV001) + ',DINT' + IntToStr(beginST4 + ((i-1) * lenUserXTV)) + ',8';     //NEU
+    FwSt4[i].TagName          := 'DB'+ IntToStr(FW4_XTV001) + ',S' + IntToStr(beginHeaderXTV + ((i-1) * lenHeaderXTV)) + ',16';     //NEU
+    FwSt4[i].OnValueChange    := UpdateFwSt4; 
+    FwSt4[i].TagNameType      := ttAbsolute;  
+    
+//Grid1.Cells[4,0] := 'Produktions-Nr.';  
+//PN    
+    PN4[i]                := Tisi_TagItem.Create(FW4PN);
+    PN4[i].TagItemList    := FW4PN;
+    PN4[i].Name           := 'PN4' + IntToStr(i);
+    PN4[i].Tag            := i;
+    PN4[i].TagName        := 'DB'+ IntToStr(FW4_XTV001) + ',S' + IntToStr(beginPN4 + ((i-1) * lenUserXTV)) + ',8';              
+    PN4[i].OnValueChange  := UpdatePN4; 
+    PN4[i].TagNameType    := ttAbsolute;
+    
+//Grid1.Cells[5,0] := 'Fahrzeugtyp';   
+//FB    
+    FB4[i]                := Tisi_TagItem.Create(FW4PN);
+    FB4[i].TagItemList    := FW4PN;
+    FB4[i].Name           := 'FB4' + IntToStr(i);
+    FB4[i].Tag            := i;
+    FB4[i].TagName        := 'DB'+ IntToStr(FW4_XTV001) + ',S' + IntToStr(beginFB4 + ((i-1) * lenUserXTV)) + ',4'; 
+    FB4[i].OnValueChange  := UpdateFB4; 
+    FB4[i].TagNameType    := ttAbsolute;
+    
+//Grid1.Cells[6,0] := 'Schichtnummer';        
+//SN    
+    SN4[i]                := Tisi_TagItem.Create(FW4PN);
+    SN4[i].TagItemList    := FW4PN;
+    SN4[i].Name           := 'SN4' + IntToStr(i);
+    SN4[i].Tag            := i;
+    SN4[i].TagName        := 'DB'+ IntToStr(FW4_XTV001) + ',S' + IntToStr(beginSN4 + ((i-1) * lenUserXTV)) + ',4';
+    SN4[i].OnValueChange  := UpdateSN4;
+    SN4[i].TagNameType    := ttAbsolute;
+    
+//Grid1.Cells[7,0] := 'Baumuster';   
+//BM    
+    BM4[i]                := Tisi_TagItem.Create(FW4PN);
+    BM4[i].TagItemList    := FW4PN;
+    BM4[i].Name           := 'BM4' + IntToStr(i);
+    BM4[i].Tag            := i;
+    BM4[i].TagName        := 'DB'+ IntToStr(FW4_XTV001) + ',S' + IntToStr(beginBM4 + ((i-1) * lenUserXTV)) + ',12';
+    BM4[i].OnValueChange  := UpdateBM4;
+    BM4[i].TagNameType    := ttAbsolute;
+    
+//Grid1.Cells[8,0] := 'Tagesnummer';  
+//TK    
+    TK4[i]                := Tisi_TagItem.Create(FW4PN);
+    TK4[i].TagItemList    := FW4PN;
+    TK4[i].Name           := 'TK4' + IntToStr(i);
+    TK4[i].Tag            := i;
+    TK4[i].TagName        := 'DB'+ IntToStr(FW4_XTV001) + ',S' + IntToStr(beginTK4 + ((i-1) * lenUserXTV)) + ',8';
+    TK4[i].OnValueChange  := UpdateTK4;
+    TK4[i].TagNameType    := ttAbsolute;
+    
+//Grid1.Cells[9,0] := 'Reparatur';    
+////RP    
+//    RP4[i]                := Tisi_TagItem.Create(FW4PN);
+//    RP4[i].TagItemList    := FW4PN;
+//    RP4[i].Name           := 'RP4' + IntToStr(i);
+//    RP4[i].Tag            := i;
+//    RP4[i].TagName        := 'DB'+ IntToStr(FW4_USER_REP) + ',S' + IntToStr(beginFW4_Rep + ((i-1) * lenUserRep)) + ',100';
+//    RP4[i].OnValueChange  := UpdateRP4;
+//    RP4[i].TagNameType    := ttAbsolute;
+   
+  
+
+end;
+
+    ActivateTagItemList(FW, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+    ActivateTagItemList(FW1, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+    ActivateTagItemList(FW2, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+    ActivateTagItemList(FW3, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+    ActivateTagItemList(FW4, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+    ActivateTagItemList(FW1PN, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+    ActivateTagItemList(FW2PN, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+    ActivateTagItemList(FW3PN, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+    ActivateTagItemList(FW4PN, DEFAULTCONNECTION, DEFAULTPLANT, DEFAULTFGNAME, false);
+end;
+                                 
+
+               
+//--------------------------------------- START FW1 ----------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Daten von SPS holen POS
+procedure UpdateFwPos1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if AValue <> 0 then
+        begin
+            Grid1.Cells[2,number] := IntToStr(AValue);
+            Grid1.Cells[1,number] := 'FW1'; 
+        end;
+end;
+
+//Daten von SPS holen FWSt1      (Station)    
+procedure UpdateFWSt1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW1') then
+        begin
+            Grid1.Cells[3,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen PN    (Produktionsnummer)    #5
+procedure UpdatePN1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW1') then
+        begin
+            Grid1.Cells[4,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen FB
+procedure UpdateFB1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW1') then
+        begin
+            Grid1.Cells[5,number] := AValue; 
+        end;
+end; 
+
+//Daten von SPS holen SN
+procedure UpdateSN1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW1') then
+        begin
+            Grid1.Cells[6,number] := Copy(AValue, 1, 1) + Copy(AValue, 3, 3); 
+        end;
+end;                                                              
+
+//Daten von SPS holen BM
+procedure UpdateBM1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW1') then
+        begin
+            Grid1.Cells[7,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen TK
+procedure UpdateTK1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW1') then
+        begin
+            Grid1.Cells[8,number] := AValue; 
+        end;
+end;
+     
+
+////Daten von SPS holen FWSt1      (Station)    
+//procedure UpdateFWSt1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+//var
+//number : integer;
+//begin
+//  if not AValueValid then exit;
+//        number:= Tisi_TagItem(Sender).Tag; 
+//        Grid1.Cells[9,number] := AValue; 
+//end;
+
+
+////Daten von SPS holen RP
+//procedure UpdateRP1(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+//var
+//number : integer;
+//begin
+//  if not AValueValid then exit;
+//        number:= Tisi_TagItem(Sender).Tag; 
+//        Grid1.Cells[9,number] := AValue; 
+//end;
+
+    
+                                                                                          
+//+++++++++++++++++++++++++++++++++++++++ ENDE FW1 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++            
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+               
+//--------------------------------------- START FW2 ----------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Daten von SPS holen POS
+procedure UpdateFwPos2(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if AValue <> 0 then
+        begin
+            Grid1.Cells[2,number] := IntToStr(AValue);
+            Grid1.Cells[1,number] := 'FW2'; 
+        end;
+end;
+
+//Daten von SPS holen FWSt2      (Station)    
+procedure UpdateFWSt2(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW2') then
+        begin
+            Grid1.Cells[3,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen PN    (Produktionsnummer)
+procedure UpdatePN2(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW2') then
+        begin
+            Grid1.Cells[4,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen FB
+procedure UpdateFB2(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW2') then
+        begin
+            Grid1.Cells[5,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen SN
+procedure UpdateSN2(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW2') then
+        begin
+            Grid1.Cells[6,number] := Copy(AValue, 1, 1) + Copy(AValue, 3, 3); 
+        end;
+end;                                                              
+
+//Daten von SPS holen BM
+procedure UpdateBM2(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW2') then
+        begin
+            Grid1.Cells[7,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen TK
+procedure UpdateTK2(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW2') then
+        begin
+            Grid1.Cells[8,number] := AValue; 
+        end;
+end;
+
+////Daten von SPS holen RP
+//procedure UpdateRP2(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+//var
+//number : integer;
+//begin
+//  if not AValueValid then exit;
+//        number:= Tisi_TagItem(Sender).Tag; 
+//        Grid1.Cells[9,number] := AValue; 
+//end;
+
+
+
+                                                                                       
+//+++++++++++++++++++++++++++++++++++++++ ENDE FW2 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++            
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+               
+//--------------------------------------- START FW3 ----------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 
+//Daten von SPS holen FW      (Fahrwagen)     #1
+
+//Daten von SPS holen Anlage      (Anlage)    #2
+
+
+//Daten von SPS holen POS
+procedure UpdateFwPos3(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if AValue <> 0 then
+        begin
+            Grid1.Cells[2,number] := IntToStr(AValue);
+            Grid1.Cells[1,number] := 'FW3'; 
+        end;
+end;
+
+//Daten von SPS holen FWSt3      (Station)    
+procedure UpdateFWSt3(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW3') then
+        begin
+            Grid1.Cells[3,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen PN    (Produktionsnummer)    #5
+procedure UpdatePN3(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW3') then
+        begin
+            Grid1.Cells[4,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen FB
+procedure UpdateFB3(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW3') then
+        begin
+            Grid1.Cells[5,number] := AValue; 
+        end;
+end;  
+
+
+//Daten von SPS holen SN
+procedure UpdateSN3(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW3') then
+        begin
+            Grid1.Cells[6,number] := Copy(AValue, 1, 1) + Copy(AValue, 3, 3); 
+        end;
+end;                                                              
+
+//Daten von SPS holen BM
+procedure UpdateBM3(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW3') then
+        begin
+            Grid1.Cells[7,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen TK
+procedure UpdateTK3(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW3') then
+        begin
+            Grid1.Cells[8,number] := AValue; 
+        end;
+end;
+//
+////Daten von SPS holen RP
+//procedure UpdateRP3(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+//var
+//number : integer;
+//begin
+//  if not AValueValid then exit;
+//        number:= Tisi_TagItem(Sender).Tag; 
+//        Grid1.Cells[9,number] := AValue; 
+//end;
+
+
+
+
+                                                                                        
+//+++++++++++++++++++++++++++++++++++++++ ENDE FW3 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++            
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+               
+//--------------------------------------- START FW4 ----------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//Daten von SPS holen POS
+procedure UpdateFwPos4(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if AValue <> 0 then
+        begin
+            Grid1.Cells[2,number] := IntToStr(AValue);
+            Grid1.Cells[1,number] := 'FW4'; 
+        end;
+end;
+ 
+//Daten von SPS holen FWSt4      (Station)    
+procedure UpdateFWSt4(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW4') then
+        begin
+            Grid1.Cells[3,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen PN    (Produktionsnummer)    #5
+procedure UpdatePN4(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW4') then
+        begin
+            Grid1.Cells[4,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen FB
+procedure UpdateFB4(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW4') then
+        begin
+            Grid1.Cells[5,number] := AValue; 
+        end;
+end;
+    
+
+//Daten von SPS holen SN
+procedure UpdateSN4(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW4') then
+        begin
+            Grid1.Cells[6,number] := Copy(AValue, 1, 1) + Copy(AValue, 3, 3); 
+        end;
+end;                                                              
+
+//Daten von SPS holen BM
+procedure UpdateBM4(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW4') then
+        begin
+            Grid1.Cells[7,number] := AValue; 
+        end;
+end;
+
+//Daten von SPS holen TK
+procedure UpdateTK4(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+var
+number : integer;
+begin
+  if not AValueValid then exit;
+        number:= Tisi_TagItem(Sender).Tag; 
+        if (Grid1.Cells[1,number] = 'FW4') then
+        begin
+            Grid1.Cells[8,number] := AValue; 
+        end;
+end;
+
+////Daten von SPS holen RP
+//procedure UpdateRP4(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+//var
+//number : integer;
+//begin
+//  if not AValueValid then exit;
+//        number:= Tisi_TagItem(Sender).Tag; 
+//        Grid1.Cells[9,number] := AValue; 
+//end;
+
+                                                                                        
+//+++++++++++++++++++++++++++++++++++++++ ENDE FW4 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++            
+//------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+//// ------------------------     Fahrwagendetailbild fehlt aktuell -----------------------
+//Grid1.OnDblClickCell     //(Wenn Doppelclick auf Zelle, Dann)
+//procedure Grid1DblClickCell(Sender: TObject; ARow: Integer; ACol: Integer);
+//begin
+//    if ARow > 0 then
+//    begin
+//        FW_Nr.Write(ARow); 
+//        ShowNavWindow('SFFW1S1_S001_Fahrwagenbild');  
+//    end;  
+//end;
+//// ------------------------     Fahrwagendetailbild fehlt aktuell -----------------------
+
+
+
+//============================================= SUCHFUNKTIONEN =============================================
+// searchPn.OnChange      (Suche wenn Werte in Suchbox geändert ProdNummer)
+procedure searchPnChange(Sender: TObject);
+var
+y : integer;
+searchFor : string;
+begin
+  for y:= 1 To 200 do
+  begin
+    if (searchPn.Text <> '') then
+    begin
+      searchFor:= Copy(Grid1.Cells[3,y], 1, length(searchPn.Text));
+      if (searchPn.Text = searchFor)then
+        begin
+            Grid1.Row:= y;
+            exit;
+        end;
+    end
+    else
+    begin
+      Grid1.Row:= 1;
+    end;
+  end;  
+end;
+
+// searchPn.OnEnter      (Suche wenn "Enter" ProdNummer)
+procedure searchPnEnter(Sender: TObject);
+begin
+    if searchPn.Text = 'PN SUCHEN...' then searchPn.Text:= ''; 
+end;
+
+// searchPn.OnExit      (Suche beim verlassen der Box ProdNummer)
+procedure searchPnExit(Sender: TObject);
+begin
+    if searchPn.Text = '' then searchPn.Text:= 'PN SUCHEN...';  
+end;
+
+
+// searchSn.OnChange      (Suche wenn Werte in Suchbox geändert Schichtnummer)
+procedure searchSnChange(Sender: TObject);
+var
+y : integer;
+searchFor : string;
+begin
+  for y:= 1 To 200 do
+  begin
+    if (searchSn.Text <> '') then
+    begin
+      searchFor:= Copy(Grid1.Cells[6,y], 1, length(searchSn.Text));
+      if (searchSn.Text = searchFor)then
+        begin
+            Grid1.Row:= y;
+            exit;
+        end;
+    end
+    else
+    begin
+      Grid1.Row:= 1;
+    end;
+  end;  
+end;
+
+// searchSn.OnEnter      (Suche wenn "Enter" SchichtNummer)
+procedure searchSnEnter(Sender: TObject);
+begin
+    if searchSn.Text = 'SN SUCHEN...' then searchSn.Text:= ''; 
+end;
+
+// searchSn.OnExit      (Suche beim verlassen der Box Schichtnummer)
+procedure searchSnExit(Sender: TObject);
+begin
+    if searchSn.Text = '' then searchSn.Text:= 'SN SUCHEN...';  
+end;
+
+
+// searchFW.OnChange      (Suche wenn Werte in Suchbox geändert Fahrwagen-Nummer)
+procedure searchFWChange(Sender: TObject);
+var
+y : integer;
+begin
+  for y:= 1 To 200 do
+  begin
+    if (searchFW.Text = Grid1.Cells[0,y]) And (searchFW.Text <> '') then
+    begin
+        Grid1.Row:= y;
+        exit;
+    end
+    else
+    begin
+      Grid1.Row:= 1;
+    end;
+  end;  
+end;
+
+// searchFW.OnEnter      (Suche wenn "Enter" Fahrwagen-Nummer)
+procedure searchFWEnter(Sender: TObject);
+begin
+    if searchFW.Text = 'FW SUCHEN...' then searchFW.Text:= '';   
+end;
+
+// searchFW.OnExit      (Suche beim verlassen der Box Fahrwagen-Nummer)
+procedure searchFWExit(Sender: TObject);
+begin
+    if searchFW.Text = '' then searchFW.Text:= 'FW SUCHEN...';  
+end;
+              
+// Sonderlabel Sprungfunktion in SFFW1S1
+// btnFW1.OnClick
+procedure btnFW1Click(Sender: TObject);
+begin
+    SIS.OpenIDProModule('SFFW1S1_Main', '- SFFW1S1', 'SFFW1S1', '', 'P','');  
+end;
+// FW1_fault.OnValueChange
+procedure FW1_faultValueChange(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+begin
+     if not AValueValid Then Exit;
+     if AValue then
+        btnFW1.color := $005555FF
+     else   
+        btnFW1.color := clLime;
+end;
+
+// Sonderlabel Sprungfunktion in SFFW2S1
+// btnFW2.OnClick
+procedure btnFW2Click(Sender: TObject);
+begin
+    SIS.OpenIDProModule('SFFW2S1_Main', '- SFFW2S1', 'SFFW2S1', '', 'P','');  
+end;
+// FW2_fault.OnValueChange
+procedure FW2_faultValueChange(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+begin
+     if not AValueValid Then Exit;
+     if AValue then
+        btnFW2.color := $005555FF
+     else   
+        btnFW2.color := clLime;
+end;
+
+// Sonderlabel Sprungfunktion in SFFW3S1
+// btnFW3.OnClick
+procedure btnFW3Click(Sender: TObject);
+begin
+    SIS.OpenIDProModule('SFFW3S1_Main', '- SFFW3S1', 'SFFW3S1', '', 'P','');  
+end;
+// FW3_fault.OnValueChange
+procedure FW3_faultValueChange(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+begin
+     if not AValueValid Then Exit;
+     if AValue then
+        btnFW3.color := $005555FF
+     else   
+        btnFW3.color := clLime;
+end;
+
+// Sonderlabel Sprungfunktion in SFFW4S1
+// btnFW4.OnClick
+procedure btnFW4Click(Sender: TObject);
+begin
+    SIS.OpenIDProModule('SFFW4S1_Main', '- SFFW4S1', 'SFFW4S1', '', 'P','');  
+end;
+// FW4_fault.OnValueChange
+procedure FW4_faultValueChange(Sender: TObject; AValue: Variant; AValueValid: Boolean);
+begin
+     if not AValueValid Then Exit;
+     if AValue then
+        btnFW4.color := $005555FF
+     else   
+        btnFW4 .color := clLime;
+end;
+
